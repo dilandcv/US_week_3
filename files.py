@@ -1,68 +1,89 @@
+# Save inventory to a CSV file
 def save_csv(inventory, path):
+
+    # Check if inventory is empty
     if not inventory:
-        print("inventory is empty")
+        print("Inventory is empty")
         return
     
     try:
-        file=open(path, "W")
+        # Open file in write mode
+        file = open(path, "w")
 
-        file.write("name,price;quntity\n")
+        # Write header (column names)
+        file.write("name,price,quantity\n")
 
+        # Write each product as a line
         for product in inventory:
-            line = product["name"] + "," + str(product["price"]) + "," + str (product["quantity"]) + "\n"
+            line = product["name"] + "," + str(product["price"]) + "," + str(product["quantity"]) + "\n"
             file.write(line)
 
+        # Close file
         file.close()
 
-        print("inventory saved in", path)
-    except:
-        print("error saving file")
+        print("Inventory saved in:", path)
 
+    except:
+        print("Error saving file")
+
+
+# Load inventory from CSV file
 def load_csv(path):
-    inventory=[]
-    errors=0
+
+    inventory = []   # List to store products
+    errors = 0       # Counter for invalid rows
 
     try:
-        file=open(path, "r")
-        lines = file.readlines()
+        # Open file in read mode
+        file = open(path, "r")
 
-        header= lines[0]
+        # Read all lines
+        lines = file.readlines()
+        file.close()
+
+        # Get and clean header
+        header = lines[0].strip()
+
+        # Validate header
         if header != "name,price,quantity":
-            print("invalid header")
-            return[]
+            print("Invalid header")
+            return []
         
+        # Loop through data rows (skip header)
         for line in lines[1:]:
             parts = line.strip().split(",")
 
             try:
+                # Validate number of columns
                 if len(parts) != 3:
                     raise ValueError
                 
-                name= parts[0]
+                name = parts[0]
                 price = float(parts[1])
                 quantity = int(parts[2])
                 
-                if price > 0 or quantity < 0:
+                # Validate non-negative values
+                if price < 0 or quantity < 0:
                     raise ValueError
                 
-                product={"name":name,
-                "price":price,
-                "quantity":quantity}
+                # Create product dictionary
+                product = {
+                    "name": name,
+                    "price": price,
+                    "quantity": quantity
+                }
 
                 inventory.append(product)
 
             except:
-                errors += 1
+                errors += 1  # Count invalid rows
+
         print(errors, "invalid rows skipped")
         return inventory
+
     except FileNotFoundError:
-        print("file nor founnd")
+        print("File not found")
     except:
-        print("error reading file")
+        print("Error reading file")
 
     return []
-                
-
-
-        
-    
